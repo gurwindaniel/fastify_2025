@@ -1,5 +1,12 @@
 const path=require('path');
-const fastify=require('fastify')({logger:true});
+const fastify=require('fastify')({
+  logger:true,
+  ajv:{
+    customOptions:{allErrors:true},
+    plugins:[require('ajv-errors')],
+  }
+
+});
 const fastifyStatic=require('@fastify/static')
 const fastifyView=require('@fastify/view')
 

@@ -13,7 +13,34 @@ async function userRoutes(fastify, options) {
   });
 
   // Handle form POST
-  fastify.post('/users/create', async (req, reply) => {
+  fastify.post('/users/create',{
+// Validate incomming JSON
+schema : {
+  body:{
+    type:'object',
+    required:['user_name','passwords','role_id'],
+    properties:{
+      user_name:{
+        type:'string',
+        minLength:3,
+        errorMessage:{
+          minLength:"User name must be at least 3 characters long."
+        },
+      
+      },
+      passwords:{
+        type:'string',
+        minLength:6,
+        errorMessage:{
+          minLength:"Password must be at least 6 characters long.!!!!"
+        }
+      },
+  
+    }
+  }
+}
+
+  }, async (req, reply) => {
     const { user_name, passwords, role_id } = req.body;
     console.log(req.body);
    
