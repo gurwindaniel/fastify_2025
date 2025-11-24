@@ -1,5 +1,10 @@
 module.exports = async function (fastify) {
 
+    // Root should bring login (central entry point)
+    fastify.get('/', async (req, reply) => {
+        return reply.redirect('/login');
+    });
+
     const pool = require('../db/pool');
     const bcrypt = require("bcryptjs");
 
