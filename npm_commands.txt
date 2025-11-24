@@ -1,0 +1,7 @@
+npm install fastify
+
+npm install @fastify/view ejs @fastify/static  @fastify/formbody pg
+
+npm install nodemon --save-dev
+
+npm install bcryptjs
