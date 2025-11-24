@@ -20,6 +20,20 @@
         </li>
 
       </ul>
+      <ul class="navbar-nav ms-auto">
+        <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+          <li class="nav-item">
+            <span class="nav-link">Hello, <%= currentUser.user_name %></span>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">Logout</a>
+          </li>
+        <% } else { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/login">Login</a>
+          </li>
+        <% } %>
+      </ul>
     </div>
   </div>
 </nav>

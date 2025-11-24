@@ -4,11 +4,14 @@ const bcryptjs=require('bcryptjs');
 async function userRoutes(fastify, options) {
 
   // Display user creation form
-  fastify.get('/users', async (req, reply) => {
+  fastify.get('/users', 
+    { preHandler: fastify.authenticate }
+    ,async (req, reply) => {
     const roles = await pool.query("SELECT * FROM roles ORDER BY role_id ASC");
 
     return reply.view('users.ejs', {
-      roles: roles.rows
+      roles: roles.rows,
+      currentUser: req.user || null
     });
   });
 

@@ -7,3 +7,7 @@ npm install nodemon --save-dev
 npm install bcryptjs
 
 npm install ajv-errors
+
+npm install @fastify/jwt
+
+npm install @fastify/cookie
