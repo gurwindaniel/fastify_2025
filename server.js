@@ -103,6 +103,7 @@ fastify.register(require('@fastify/formbody'));
 fastify.register(require('./routes/auth'));
 fastify.register(require('./routes/items'));
 fastify.register(require('./routes/users'));
+fastify.register(require('./routes/address'));
 
 
 

@@ -42,7 +42,6 @@ module.exports = async function (fastify) {
             user_name: user.user_name
         });
 
-        console.log("Generated JWT:", token);
 
         reply.setCookie("token", token, {
             httpOnly: true,
