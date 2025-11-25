@@ -105,6 +105,8 @@ fastify.register(require('./routes/users'));
 fastify.register(require('./routes/address'));
 fastify.register(require('./routes/product'));
 fastify.register(require('./routes/grn'));
+fastify.register(require('./routes/invoice'));
+fastify.register(require('./routes/dashboard'));
 
 
 

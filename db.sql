@@ -50,3 +50,29 @@ CREATE TABLE grn(
 );
 
 ALTER SEQUENCE public.grn_grn_id_seq RESTART WITH 1;
+
+-- create invoice if missing
+CREATE TABLE IF NOT EXISTS invoice(
+  invoice_id SERIAL PRIMARY KEY,
+  address_id INT NOT NULL REFERENCES address(address_id),
+  invoice_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  user_id INT NOT NULL REFERENCES users(user_id)
+);
+
+-- create sale if missing
+CREATE TABLE IF NOT EXISTS sale(
+  sale_id SERIAL PRIMARY KEY,
+  invoice_id INT NOT NULL REFERENCES invoice(invoice_id),
+  product_id INT NOT NULL REFERENCES product(product_id),
+  grn_id INT REFERENCES grn(grn_id),
+  vendor_address_id INT REFERENCES address(address_id),
+  sale_amount DECIMAL(10,2) NOT NULL,
+  sale_quantity INT NOT NULL,
+  sale_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  user_id INT NOT NULL REFERENCES users(user_id)
+);
+
+-- Notes:
+-- 1) Ensure in application logic that `invoice.address_id` refers to a Customer (person_type = 'Customer').
+-- 2) `grn_id` is optional on a sale; include it when the sold goods map directly to a prior GRN (vendor source).
+-- 3) `vendor_address_id` stores the vendor address (useful when multiple vendors supply the same product).
