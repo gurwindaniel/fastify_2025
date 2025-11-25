@@ -96,7 +96,8 @@ SELECT p.product_id, p.product_name,
        COALESCE(g.received_cost,0) AS received_cost,
        COALESCE(s.sold_qty,0) AS sold_qty,
        COALESCE(s.sales_amount,0) AS sales_amount,
-       CASE WHEN COALESCE(g.received_qty,0) > 0 THEN (COALESCE(s.sales_amount,0) - COALESCE(s.sold_qty,0) * (g.received_cost/g.received_qty)) ELSE (COALESCE(s.sales_amount,0)) END AS profit_est
+      -- profit as requested: (sales_amount * sold_qty) - (received_cost * sold_qty)
+      (COALESCE(s.sales_amount,0) * COALESCE(s.sold_qty,0) - COALESCE(g.received_cost,0) * COALESCE(s.sold_qty,0)) AS profit_est
 FROM product p
 JOIN grn_stats g ON p.product_id = g.product_id
 LEFT JOIN sale_stats s ON p.product_id = s.product_id

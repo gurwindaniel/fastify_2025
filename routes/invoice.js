@@ -53,10 +53,12 @@ async function invoiceRoutes(fastify, options) {
       if (isNaN(vendorId)) return reply.code(400).send({ error: 'Invalid vendor id' });
 
       const products = await pool.query(
-        `SELECT DISTINCT p.product_id, p.product_name
+        `SELECT p.product_id, p.product_name,
+                COALESCE(AVG(g.grn_amount::numeric), 0) AS received_price
          FROM product p
          JOIN grn g ON p.product_id = g.product_id
          WHERE g.address_id = $1 AND g.user_id = $2
+         GROUP BY p.product_id, p.product_name
          ORDER BY p.product_name ASC`,
         [vendorId, req.user.user_id]
       );

@@ -45,10 +45,15 @@
                 <option value="">-- Select Product --</option>
                 <% if (products && products.length) { %>
                   <% products.forEach(p => { %>
-                    <option value="<%= p.product_id %>"><%= p.product_name %></option>
+                    <option value="<%= p.product_id %>" data-received-price="<%= Number(p.received_price || 0).toFixed(2) %>"><%= p.product_name %></option>
                   <% }) %>
                 <% } %>
               </select>
+            </div>
+
+            <!-- Display received price for selected product (populated by JS) -->
+            <div id="received_price_container" class="mb-2" style="display:none;">
+              <small class="text-muted">Received price: <span id="received_price_value">0.00</span> ₹</small>
             </div>
 
             <div class="mb-3">
@@ -78,6 +83,9 @@
     const vendorId = this.value;
     const prodSelect = document.getElementById('product_id');
     prodSelect.innerHTML = '<option value="">-- Select Product --</option>';
+    // hide received price when vendor changes
+    document.getElementById('received_price_container').style.display = 'none';
+    document.getElementById('received_price_value').textContent = '0.00';
 
     if (!vendorId) return;
 
@@ -89,6 +97,8 @@
           const opt = document.createElement('option');
           opt.value = p.product_id;
           opt.textContent = p.product_name;
+          // attach received price (formatted to 2 decimals)
+          opt.dataset.receivedPrice = (Number(p.received_price || 0)).toFixed(2);
           prodSelect.appendChild(opt);
         });
       } else {
@@ -100,6 +110,23 @@
       }
     } catch (err) {
       console.error(err);
+    }
+  });
+
+  // When product changes, display received price (if present)
+  document.getElementById('product_id').addEventListener('change', function () {
+    const opt = this.options[this.selectedIndex];
+    const price = opt ? opt.dataset.receivedPrice : null;
+    const container = document.getElementById('received_price_container');
+    const span = document.getElementById('received_price_value');
+    if (price && price !== 'undefined') {
+      // format number to 2 decimals
+      const num = Number(price) || 0;
+      span.textContent = num.toFixed(2);
+      container.style.display = '';
+    } else {
+      span.textContent = '0.00';
+      container.style.display = 'none';
     }
   });
 </script>
