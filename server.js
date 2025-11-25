@@ -101,9 +101,10 @@ fastify.register(require('@fastify/formbody'));
 
 //Import routes
 fastify.register(require('./routes/auth'));
-fastify.register(require('./routes/items'));
 fastify.register(require('./routes/users'));
 fastify.register(require('./routes/address'));
+fastify.register(require('./routes/product'));
+fastify.register(require('./routes/grn'));
 
 
 

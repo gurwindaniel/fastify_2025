@@ -10,8 +10,8 @@ module.exports = async function (fastify) {
 
     // Show login page
     fastify.get("/login", async (req, reply) => {
-        // If already authenticated, redirect to items
-        if (req.user) return reply.redirect('/items');
+        // If already authenticated, redirect to main app (GRN)
+        if (req.user) return reply.redirect('/grn');
         return reply.view("login.ejs", { error: null, currentUser: req.user || null });
     });
 
@@ -50,7 +50,7 @@ module.exports = async function (fastify) {
             path: "/"
         });
 
-        return reply.redirect("/items");
+        return reply.redirect("/grn");
     });
 
     // Logout

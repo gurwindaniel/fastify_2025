@@ -10,15 +10,7 @@ CREATE TABLE users (
     role_id INT REFERENCES roles(role_id)
 );
 
-CREATE TABLE items (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(100),
-  quantity INT
-);
 
-
-insert into items (id,name, quantity) values (1,'Laptop',3);
-insert into items (id,name, quantity) values (2,'Printer',5);
 
 INSERT INTO roles (role_name) VALUES
 ('Admin'),
@@ -41,3 +33,20 @@ CREATE TABLE address(
     user_id INT REFERENCES users(user_id) NOT NULL,
     address_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE product(
+    product_id SERIAL PRIMARY KEY,
+    product_name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE grn(
+    grn_id SERIAL PRIMARY KEY,
+    address_id INT REFERENCES address(address_id) NOT NULL,
+    product_id INT REFERENCES product(product_id) NOT NULL,
+    grn_amount DECIMAL(10,2) NOT NULL,
+    grn_quantity INT NOT NULL,
+    grn_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    user_id INT REFERENCES users(user_id) NOT NULL
+);
+
+ALTER SEQUENCE public.grn_grn_id_seq RESTART WITH 1;
