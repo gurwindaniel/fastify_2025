@@ -49,7 +49,7 @@ CREATE TABLE grn(
     user_id INT REFERENCES users(user_id) NOT NULL
 );
 
-ALTER SEQUENCE public.grn_grn_id_seq RESTART WITH 1;
+--ALTER SEQUENCE public.grn_grn_id_seq RESTART WITH 1;
 
 -- create invoice if missing
 CREATE TABLE IF NOT EXISTS invoice(

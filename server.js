@@ -1,4 +1,7 @@
 const path=require('path');
+// At the top-level of your main server file (e.g., server.js)
+global.pgPool = require('./db/pool');
+const pool=global.pgPool;
 const fastify=require('fastify')({
   logger:true,
   ajv:{

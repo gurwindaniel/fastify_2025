@@ -1,4 +1,4 @@
-const pool = require('../db/pool');
+const pool = global.pgPool;
 
 async function invoiceRoutes(fastify, options) {
 

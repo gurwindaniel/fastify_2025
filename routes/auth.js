@@ -5,7 +5,7 @@ module.exports = async function (fastify) {
         return reply.redirect('/login');
     });
 
-    const pool = require('../db/pool');
+   const pool = global.pgPool;
     const bcrypt = require("bcryptjs");
 
     // Show login page

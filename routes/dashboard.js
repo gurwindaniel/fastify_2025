@@ -1,5 +1,4 @@
-const pool = require('../db/pool');
-
+const pool = global.pgPool;
 async function dashboardRoutes(fastify, options) {
 
   // Dashboard page

@@ -1,5 +1,4 @@
-const pool = require('../db/pool');
-
+const pool = global.pgPool;
 async function grnRoutes(fastify, options) {
 
   // Display GRN creation form

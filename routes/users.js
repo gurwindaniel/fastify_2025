@@ -1,4 +1,4 @@
-const pool = require('../db/pool');
+const pool = global.pgPool;
 const bcryptjs=require('bcryptjs');
 
 async function userRoutes(fastify, options) {
