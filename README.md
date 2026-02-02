@@ -50,12 +50,27 @@ fastinv/
      cp /path/to/downloaded/ca-cert.pem ./fastinv/db/ca.pem
      # On Windows, use Explorer or Notepad to create and paste the contents.
      ```
-5. **Run the application:**
+5. **Initialize the Database:**
+    - To set up the database schema and initial data, execute the `db.sql` file on your Avien Cloud PostgreSQL database.
+    - Example command using `psql`:
+       ```
+       psql -h <your_avien_host> -p <your_avien_port> -U root -W -d fastinv -f db.sql
+       ```
+       - When prompted for a password, enter: `123456`
+       - Replace `<your_avien_host>` and `<your_avien_port>` with your Avien Cloud details.
+       - Make sure you have `psql` installed (part of PostgreSQL tools).
+       - This will create all tables and insert initial data (including the root user).
+6. **Run the application:**
    ```
    node server.js
    ```
+
 6. **Access the app:**
-   Open your browser at `http://localhost:PORT` (replace PORT with your configured port).
+   - Open your browser at `http://localhost:PORT` (replace PORT with your configured port).
+   - **Default login credentials:**
+     - Username: `root`
+     - Password: `123456`
+   - These credentials are created by the `db.sql` script and can be used to log in after the initial setup.
 
 ## Security
 - Do not commit your `.env` file, `ca.pem`, or any sensitive credentials to version control.
