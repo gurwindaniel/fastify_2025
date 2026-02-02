@@ -10,12 +10,16 @@ CREATE TABLE users (
     role_id INT REFERENCES roles(role_id)
 );
 
-INSERT INTO users (user_name, passwords, role_id)
-VALUES ('root', '$2b$10$yAphPt3T8mVIZCnrVR5jtOQXeLhNfyE6arJNkRk1ix4gSfyCdWQAS', 1);
 
 INSERT INTO roles (role_name) VALUES
 ('Admin'),
 ('Sales');
+
+
+INSERT INTO users (user_name, passwords, role_id)
+VALUES ('root', '$2b$10$yAphPt3T8mVIZCnrVR5jtOQXeLhNfyE6arJNkRk1ix4gSfyCdWQAS', 1);
+
+
 
 create table person_type(
 type_id serial primary key,
