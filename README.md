@@ -31,6 +31,7 @@ fastinv/
    ```
 3. **Create a `.env` file in the `fastinv/` directory:**
    ```
+   SECRET=YOUR SECRET SESSION KEY
    DB_USER=your_db_user
    DB_HOST=your_db_host
    DB_DATABASE=your_db_name
