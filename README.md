@@ -15,8 +15,10 @@ fastinv/
   db.sql                # Database schema
   package.json          # Node.js dependencies and scripts
   server.js             # Main server file
+  .env                  # Store all secret keys in here
   db/
     pool.js             # PostgreSQL connection pool (uses .env)
+    ca.pem              # copy the public key from avien console
   public/               # Static JS files
   routes/               # Express route handlers
   views/                # EJS templates
