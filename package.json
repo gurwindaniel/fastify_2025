@@ -18,6 +18,7 @@
     "@fastify/view": "^11.1.1",
     "ajv-errors": "^3.0.0",
     "bcryptjs": "^3.0.3",
+    "dotenv": "^17.2.3",
     "ejs": "^3.1.10",
     "fastify": "^5.6.2",
     "fastify-static": "^4.6.1",

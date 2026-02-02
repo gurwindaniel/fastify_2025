@@ -16,7 +16,7 @@ const fastifyView=require('@fastify/view')
 //Register JWT
 fastify.register(require("@fastify/cookie"));
 fastify.register(require('@fastify/jwt'),{
-  secret:'supersecretkey',
+  secret: process.env.SECRET || 'supersecretkey',
   sign:{expiresIn:'1h'},
    cookie: {
     cookieName: 'token',

@@ -1,3 +1,4 @@
 /node_modules
 /db/pool2.js
 /db/ca.pem
+/.env
