@@ -19,9 +19,27 @@ fastinv/
   db/
     pool.js             # PostgreSQL connection pool (uses .env)
     ca.pem              # copy the public key from avien console
-  public/               # Static JS files
-  routes/               # Express route handlers
-  views/                # EJS templates
+   public/               # Static JS files
+      script.js
+      userAjax.js
+   routes/               # Express route handlers
+   views/                # EJS templates
+      address.ejs
+      addressList.ejs
+      dashboard.ejs
+      grn.ejs
+      grnList.ejs
+      index.ejs
+      invoice.ejs
+      invoiceList.ejs
+      layout.ejs
+      login.ejs
+      product.ejs
+      users.ejs
+      partials/
+         footer.ejs
+         header.ejs
+         navbar.ejs
 ```
 
 ## Setup Instructions
