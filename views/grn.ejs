@@ -29,7 +29,7 @@
 
           <!-- GRN Form -->
           <form method="POST" action="/grn/create" id="grnForm" novalidate>
-            
+           <div class="row">
             <!-- Address Selection -->
             <div class="mb-3">
               <label for="address_id" class="form-label">
@@ -54,9 +54,10 @@
               </select>
               <small class="text-muted">Select the destination address for this GRN</small>
             </div>
-
+            </div>
             <!-- Product Selection -->
-            <div class="mb-3">
+             <div class="row">
+            <div class="mb-3 col-md-8">
               <label for="product_id" class="form-label">
                 <i class="bi bi-box"></i> Product
               </label>
@@ -79,7 +80,7 @@
             </div>
 
             <!-- GRN Quantity -->
-            <div class="mb-3">
+            <div class="mb-3 col-md-4">
               <label for="grn_quantity" class="form-label">
                 <i class="bi bi-hash"></i> Quantity
               </label>
@@ -95,7 +96,7 @@
               />
               <small class="text-muted">Enter quantity in whole units</small>
             </div>
-
+            </div>
             <!-- GRN Amount -->
             <div class="mb-3">
               <label for="grn_amount" class="form-label">
