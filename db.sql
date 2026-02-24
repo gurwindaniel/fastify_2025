@@ -81,3 +81,70 @@ CREATE TABLE IF NOT EXISTS sale(
 -- 1) Ensure in application logic that `invoice.address_id` refers to a Customer (person_type = 'Customer').
 -- 2) `grn_id` is optional on a sale; include it when the sold goods map directly to a prior GRN (vendor source).
 -- 3) `vendor_address_id` stores the vendor address (useful when multiple vendors supply the same product).
+
+-- SALES DASHBOARD QUERY
+SELECT 
+    COUNT(DISTINCT i.invoice_id) AS total_invoices,
+    COUNT(DISTINCT i.address_id) AS total_customers,
+    SUM(s.sale_quantity) AS total_items_sold,
+    SUM(s.sale_amount) AS total_sales_amount
+FROM sale s
+JOIN invoice i ON s.invoice_id = i.invoice_id;
+
+-- MONTHLY SALES QUERY
+
+SELECT 
+    DATE_TRUNC('month', sale_date) AS month,
+    SUM(sale_amount) AS monthly_sales,
+    SUM(sale_quantity) AS monthly_quantity
+FROM sale
+GROUP BY month
+ORDER BY month;
+
+--Inventory Dashboard Query
+SELECT 
+    p.product_id,
+    p.product_name,
+    COALESCE(SUM(g.grn_quantity), 0) AS total_received,
+    COALESCE(SUM(s.sale_quantity), 0) AS total_sold,
+    COALESCE(SUM(g.grn_quantity), 0) - COALESCE(SUM(s.sale_quantity), 0) AS current_stock
+FROM product p
+LEFT JOIN grn g ON p.product_id = g.product_id
+LEFT JOIN sale s ON p.product_id = s.product_id
+GROUP BY p.product_id, p.product_name
+ORDER BY p.product_name;
+
+
+-- Low Stock Alert:
+SELECT *
+FROM (
+    SELECT 
+        p.product_name,
+        COALESCE(SUM(g.grn_quantity), 0) - COALESCE(SUM(s.sale_quantity), 0) AS current_stock
+    FROM product p
+    LEFT JOIN grn g ON p.product_id = g.product_id
+    LEFT JOIN sale s ON p.product_id = s.product_id
+    GROUP BY p.product_name
+) stock_data
+WHERE current_stock < 5;
+
+-- Profit Dashboard Query
+
+SELECT 
+    p.product_name,
+    COALESCE(SUM(g.grn_amount), 0) AS total_purchase_amount,
+    COALESCE(SUM(s.sale_amount), 0) AS total_sales_amount,
+    COALESCE(SUM(s.sale_amount), 0) - COALESCE(SUM(g.grn_amount), 0) AS gross_profit
+FROM product p
+LEFT JOIN grn g ON p.product_id = g.product_id
+LEFT JOIN sale s ON p.product_id = s.product_id
+GROUP BY p.product_name
+ORDER BY gross_profit DESC;
+
+--Overall Business Summary
+
+SELECT 
+    (SELECT SUM(grn_amount) FROM grn) AS total_purchase,
+    (SELECT SUM(sale_amount) FROM sale) AS total_sales,
+    (SELECT SUM(sale_amount) FROM sale) -
+    (SELECT SUM(grn_amount) FROM grn) AS total_profit;

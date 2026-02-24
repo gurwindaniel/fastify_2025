@@ -1,17 +1,94 @@
 <%- include('./partials/header') %>
 
-<div class="container mt-4">
+<div class="container-fluid mt-4">
   <div class="row">
     <div class="col-12 mb-3">
       <h2>Dashboard</h2>
-      <p class="text-muted">Overview of sales/purchases and profit/loss.</p>
+      <p class="text-muted">Overview of sales/purchases, inventory, and profit/loss.</p>
+    </div>
+  </div>
+
+  <!-- Sales Summary Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card bg-primary text-white">
+        <div class="card-body">
+          <h6 class="card-title">Total Invoices</h6>
+          <h3 id="totalInvoices">-</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-info text-white">
+        <div class="card-body">
+          <h6 class="card-title">Total Customers</h6>
+          <h3 id="totalCustomers">-</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-success text-white">
+        <div class="card-body">
+          <h6 class="card-title">Items Sold</h6>
+          <h3 id="totalItemsSold">-</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-warning text-dark">
+        <div class="card-body">
+          <h6 class="card-title">Total Sales Amount</h6>
+          <h3 id="totalSalesAmount">-</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Business Summary Cards -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card border-danger">
+        <div class="card-body text-center">
+          <h6 class="card-title text-muted">Total Purchase</h6>
+          <h4 id="businessPurchase" class="text-danger">-</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-success">
+        <div class="card-body text-center">
+          <h6 class="card-title text-muted">Total Sales</h6>
+          <h4 id="businessSales" class="text-success">-</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-primary">
+        <div class="card-body text-center">
+          <h6 class="card-title text-muted">Total Profit</h6>
+          <h4 id="businessProfit" class="text-primary">-</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Monthly Sales Chart -->
+    <div class="col-lg-6 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <h5>Monthly Sales Trend</h5>
+          <canvas id="monthlySalesChart" height="250"></canvas>
+        </div>
+      </div>
     </div>
 
-    <div class="col-lg-6">
-      <div class="card mb-3">
+    <!-- Overall Summary Chart -->
+    <div class="col-lg-6 mb-4">
+      <div class="card">
         <div class="card-body">
           <h5>Overall Summary</h5>
-          <canvas id="summaryChart" height="200"></canvas>
+          <canvas id="summaryChart" height="250"></canvas>
           <div class="mt-3">
             <strong>Total Sales:</strong> <span id="totalSales">-</span><br/>
             <strong>Estimated Purchase Cost:</strong> <span id="totalPurchase">-</span><br/>
@@ -19,7 +96,46 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
 
+  <div class="row">
+    <!-- Inventory Dashboard -->
+    <div class="col-lg-6 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <h5>Inventory Status</h5>
+          <canvas id="inventoryChart" height="200"></canvas>
+          <div id="inventoryTableWrapper" class="mt-3" style="max-height: 300px; overflow-y: auto;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Low Stock Alert -->
+    <div class="col-lg-6 mb-4">
+      <div class="card border-danger">
+        <div class="card-body">
+          <h5 class="text-danger">⚠️ Low Stock Alert (< 5 units)</h5>
+          <div id="lowStockWrapper" style="max-height: 350px; overflow-y: auto;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Profit by Product -->
+    <div class="col-lg-8 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <h5>Profit by Product</h5>
+          <canvas id="profitChart" height="200"></canvas>
+          <div id="profitTableWrapper" class="mt-3" style="max-height: 300px; overflow-y: auto;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vendor Filter -->
+    <div class="col-lg-4 mb-4">
       <div class="card">
         <div class="card-body">
           <h5>Vendor Filter</h5>
@@ -34,17 +150,8 @@
           </div>
 
           <h6 class="mt-3">Vendor Product Profit/Loss</h6>
-          <canvas id="vendorChart" height="200"></canvas>
-          <div id="vendorTableWrapper" class="mt-3"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-lg-6">
-      <div class="card">
-        <div class="card-body">
-          <h5>Top Products by Profit</h5>
-          <div id="topProducts" style="min-height:320px"></div>
+          <canvas id="vendorChart" height="150"></canvas>
+          <div id="vendorTableWrapper" class="mt-3" style="max-height: 200px; overflow-y: auto;"></div>
         </div>
       </div>
     </div>
@@ -54,10 +161,31 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  const ctxSummary = document.getElementById('summaryChart').getContext('2d');
-  const ctxVendor = document.getElementById('vendorChart').getContext('2d');
-  let summaryChart, vendorChart;
+  let summaryChart, vendorChart, monthlySalesChart, inventoryChart, profitChart;
 
+  // Load Sales Summary
+  async function loadSalesSummary() {
+    const res = await fetch('/dashboard/sales-summary');
+    const data = await res.json();
+    document.getElementById('totalInvoices').textContent = data.total_invoices || 0;
+    document.getElementById('totalCustomers').textContent = data.total_customers || 0;
+    document.getElementById('totalItemsSold').textContent = data.total_items_sold || 0;
+    document.getElementById('totalSalesAmount').textContent = '₹ ' + (parseFloat(data.total_sales_amount) || 0).toFixed(2);
+  }
+
+  // Load Business Summary
+  async function loadBusinessSummary() {
+    const res = await fetch('/dashboard/business-summary');
+    const data = await res.json();
+    document.getElementById('businessPurchase').textContent = '₹ ' + (parseFloat(data.total_purchase) || 0).toFixed(2);
+    document.getElementById('businessSales').textContent = '₹ ' + (parseFloat(data.total_sales) || 0).toFixed(2);
+    const profit = parseFloat(data.total_profit) || 0;
+    const profitEl = document.getElementById('businessProfit');
+    profitEl.textContent = '₹ ' + profit.toFixed(2);
+    profitEl.className = profit >= 0 ? 'text-success' : 'text-danger';
+  }
+
+  // Load Overall Summary (existing)
   async function loadSummary() {
     const res = await fetch('/dashboard/summary');
     const data = await res.json();
@@ -70,19 +198,137 @@
     document.getElementById('profit').textContent = '₹ ' + profit.toFixed(2);
 
     const labels = ['Purchase Cost', 'Profit'];
-    const values = [totalPurchase, profit];
+    const values = [totalPurchase, Math.max(0, profit)];
+    const colors = ['#6c757d', profit >= 0 ? '#198754' : '#dc3545'];
 
     if (summaryChart) summaryChart.destroy();
-    summaryChart = new Chart(ctxSummary, {
+    summaryChart = new Chart(document.getElementById('summaryChart').getContext('2d'), {
       type: 'doughnut',
-      data: { labels, datasets: [{ data: values, backgroundColor: ['#6c757d','#198754'] }] },
+      data: { labels, datasets: [{ data: values, backgroundColor: colors }] },
       options: { responsive: true }
     });
   }
 
+  // Load Monthly Sales
+  async function loadMonthlySales() {
+    const res = await fetch('/dashboard/monthly-sales');
+    const rows = await res.json();
+
+    const labels = rows.map(r => {
+      const d = new Date(r.month);
+      return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+    });
+    const sales = rows.map(r => parseFloat(r.monthly_sales) || 0);
+    const quantities = rows.map(r => parseInt(r.monthly_quantity) || 0);
+
+    if (monthlySalesChart) monthlySalesChart.destroy();
+    monthlySalesChart = new Chart(document.getElementById('monthlySalesChart').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Sales Amount (₹)', data: sales, borderColor: '#0d6efd', backgroundColor: 'rgba(13,110,253,0.1)', fill: true, yAxisID: 'y' },
+          { label: 'Quantity Sold', data: quantities, borderColor: '#198754', backgroundColor: 'rgba(25,135,84,0.1)', fill: false, yAxisID: 'y1' }
+        ]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { type: 'linear', position: 'left', title: { display: true, text: 'Amount (₹)' } },
+          y1: { type: 'linear', position: 'right', title: { display: true, text: 'Quantity' }, grid: { drawOnChartArea: false } }
+        }
+      }
+    });
+  }
+
+  // Load Inventory
+  async function loadInventory() {
+    const res = await fetch('/dashboard/inventory');
+    const rows = await res.json();
+
+    const labels = rows.map(r => r.product_name);
+    const received = rows.map(r => parseInt(r.total_received) || 0);
+    const sold = rows.map(r => parseInt(r.total_sold) || 0);
+    const stock = rows.map(r => parseInt(r.current_stock) || 0);
+
+    if (inventoryChart) inventoryChart.destroy();
+    inventoryChart = new Chart(document.getElementById('inventoryChart').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Received', data: received, backgroundColor: '#0d6efd' },
+          { label: 'Sold', data: sold, backgroundColor: '#dc3545' },
+          { label: 'Current Stock', data: stock, backgroundColor: '#198754' }
+        ]
+      },
+      options: { responsive: true }
+    });
+
+    // Render table
+    let html = '<table class="table table-sm table-striped"><thead><tr><th>Product</th><th>Received</th><th>Sold</th><th>Stock</th></tr></thead><tbody>';
+    rows.forEach(r => {
+      const stockClass = r.current_stock < 5 ? 'text-danger fw-bold' : '';
+      html += `<tr><td>${r.product_name}</td><td>${r.total_received}</td><td>${r.total_sold}</td><td class="${stockClass}">${r.current_stock}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    document.getElementById('inventoryTableWrapper').innerHTML = html;
+  }
+
+  // Load Low Stock
+  async function loadLowStock() {
+    const res = await fetch('/dashboard/low-stock?threshold=5');
+    const rows = await res.json();
+
+    if (rows.length === 0) {
+      document.getElementById('lowStockWrapper').innerHTML = '<p class="text-success">All products have adequate stock!</p>';
+      return;
+    }
+
+    let html = '<table class="table table-sm table-danger"><thead><tr><th>Product</th><th>Current Stock</th></tr></thead><tbody>';
+    rows.forEach(r => {
+      html += `<tr><td>${r.product_name}</td><td class="fw-bold">${r.current_stock}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    document.getElementById('lowStockWrapper').innerHTML = html;
+  }
+
+  // Load Profit by Product
+  async function loadProfitByProduct() {
+    const res = await fetch('/dashboard/profit-by-product');
+    const rows = await res.json();
+
+    const labels = rows.slice(0, 10).map(r => r.product_name);
+    const profits = rows.slice(0, 10).map(r => parseFloat(r.gross_profit) || 0);
+    const colors = profits.map(p => p >= 0 ? '#198754' : '#dc3545');
+
+    if (profitChart) profitChart.destroy();
+    profitChart = new Chart(document.getElementById('profitChart').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{ label: 'Gross Profit (₹)', data: profits, backgroundColor: colors }]
+      },
+      options: {
+        responsive: true,
+        indexAxis: 'y',
+        scales: { x: { title: { display: true, text: 'Profit (₹)' } } }
+      }
+    });
+
+    // Render table
+    let html = '<table class="table table-sm table-striped"><thead><tr><th>Product</th><th>Purchase</th><th>Sales</th><th>Profit</th></tr></thead><tbody>';
+    rows.forEach(r => {
+      const profitClass = parseFloat(r.gross_profit) >= 0 ? 'text-success' : 'text-danger';
+      html += `<tr><td>${r.product_name}</td><td>₹ ${parseFloat(r.total_purchase_amount||0).toFixed(2)}</td><td>₹ ${parseFloat(r.total_sales_amount||0).toFixed(2)}</td><td class="${profitClass} fw-bold">₹ ${parseFloat(r.gross_profit||0).toFixed(2)}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    document.getElementById('profitTableWrapper').innerHTML = html;
+  }
+
+  // Load Vendor Products (existing)
   async function loadVendorProducts(vendorId) {
     if (!vendorId) {
-      // clear chart and table
       if (vendorChart) vendorChart.destroy();
       document.getElementById('vendorTableWrapper').innerHTML = '';
       return;
@@ -95,9 +341,8 @@
     const profits = rows.map(r => parseFloat(r.profit_est || 0).toFixed(2));
     const sales = rows.map(r => parseFloat(r.sales_amount || 0).toFixed(2));
 
-    // render bar chart
     if (vendorChart) vendorChart.destroy();
-    vendorChart = new Chart(ctxVendor, {
+    vendorChart = new Chart(document.getElementById('vendorChart').getContext('2d'), {
       type: 'bar',
       data: {
         labels,
@@ -109,8 +354,7 @@
       options: { responsive: true }
     });
 
-    // render table
-    let html = '<table class="table table-striped"><thead><tr><th>Product</th><th>Received Qty</th><th>Sold Qty</th><th>Sales</th><th>Received Cost</th><th>Profit Est</th></tr></thead><tbody>';
+    let html = '<table class="table table-sm table-striped"><thead><tr><th>Product</th><th>Recv</th><th>Sold</th><th>Sales</th><th>Cost</th><th>Profit</th></tr></thead><tbody>';
     rows.forEach(r => {
       html += `<tr><td>${r.product_name}</td><td>${r.received_qty}</td><td>${r.sold_qty || 0}</td><td>₹ ${parseFloat(r.sales_amount||0).toFixed(2)}</td><td>₹ ${parseFloat(r.received_cost||0).toFixed(2)}</td><td>₹ ${parseFloat(r.profit_est||0).toFixed(2)}</td></tr>`;
     });
@@ -122,8 +366,14 @@
     loadVendorProducts(this.value);
   });
 
-  // initial load
+  // Initial load
+  loadSalesSummary();
+  loadBusinessSummary();
   loadSummary();
+  loadMonthlySales();
+  loadInventory();
+  loadLowStock();
+  loadProfitByProduct();
 </script>
 
 <%- include('./partials/footer') %>

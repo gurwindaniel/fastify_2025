@@ -111,6 +111,147 @@ ORDER BY profit_est DESC;
     }
   });
 
+  // API: Sales Dashboard Summary
+  fastify.get('/dashboard/sales-summary', { preHandler: fastify.authenticate }, async (req, reply) => {
+    try {
+      const userId = req.user.user_id;
+      const q = `
+        SELECT 
+          COUNT(DISTINCT i.invoice_id) AS total_invoices,
+          COUNT(DISTINCT i.address_id) AS total_customers,
+          COALESCE(SUM(s.sale_quantity), 0) AS total_items_sold,
+          COALESCE(SUM(s.sale_amount), 0)::numeric(18,2) AS total_sales_amount
+        FROM sale s
+        JOIN invoice i ON s.invoice_id = i.invoice_id
+        WHERE s.user_id = $1
+      `;
+      const res = await pool.query(q, [userId]);
+      return reply.send(res.rows[0] || { total_invoices: 0, total_customers: 0, total_items_sold: 0, total_sales_amount: 0 });
+    } catch (err) {
+      console.error('Sales summary error:', err);
+      return reply.code(500).send({ error: err.message });
+    }
+  });
+
+  // API: Monthly Sales
+  fastify.get('/dashboard/monthly-sales', { preHandler: fastify.authenticate }, async (req, reply) => {
+    try {
+      const userId = req.user.user_id;
+      const q = `
+        SELECT 
+          DATE_TRUNC('month', sale_date) AS month,
+          SUM(sale_amount)::numeric(18,2) AS monthly_sales,
+          SUM(sale_quantity) AS monthly_quantity
+        FROM sale
+        WHERE user_id = $1
+        GROUP BY month
+        ORDER BY month
+      `;
+      const res = await pool.query(q, [userId]);
+      return reply.send(res.rows);
+    } catch (err) {
+      console.error('Monthly sales error:', err);
+      return reply.code(500).send({ error: err.message });
+    }
+  });
+
+  // API: Inventory Dashboard
+  fastify.get('/dashboard/inventory', { preHandler: fastify.authenticate }, async (req, reply) => {
+    try {
+      const userId = req.user.user_id;
+      const q = `
+        SELECT 
+          p.product_id,
+          p.product_name,
+          COALESCE(SUM(g.grn_quantity), 0) AS total_received,
+          COALESCE(SUM(s.sale_quantity), 0) AS total_sold,
+          COALESCE(SUM(g.grn_quantity), 0) - COALESCE(SUM(s.sale_quantity), 0) AS current_stock
+        FROM product p
+        LEFT JOIN grn g ON p.product_id = g.product_id AND g.user_id = $1
+        LEFT JOIN sale s ON p.product_id = s.product_id AND s.user_id = $1
+        GROUP BY p.product_id, p.product_name
+        ORDER BY p.product_name
+      `;
+      const res = await pool.query(q, [userId]);
+      return reply.send(res.rows);
+    } catch (err) {
+      console.error('Inventory error:', err);
+      return reply.code(500).send({ error: err.message });
+    }
+  });
+
+  // API: Low Stock Alert
+  fastify.get('/dashboard/low-stock', { preHandler: fastify.authenticate }, async (req, reply) => {
+    try {
+      const userId = req.user.user_id;
+      const threshold = parseInt(req.query.threshold) || 5;
+      const q = `
+        SELECT *
+        FROM (
+          SELECT 
+            p.product_id,
+            p.product_name,
+            COALESCE(SUM(g.grn_quantity), 0) - COALESCE(SUM(s.sale_quantity), 0) AS current_stock
+          FROM product p
+          LEFT JOIN grn g ON p.product_id = g.product_id AND g.user_id = $1
+          LEFT JOIN sale s ON p.product_id = s.product_id AND s.user_id = $1
+          GROUP BY p.product_id, p.product_name
+        ) stock_data
+        WHERE current_stock < $2
+        ORDER BY current_stock ASC
+      `;
+      const res = await pool.query(q, [userId, threshold]);
+      return reply.send(res.rows);
+    } catch (err) {
+      console.error('Low stock error:', err);
+      return reply.code(500).send({ error: err.message });
+    }
+  });
+
+  // API: Profit Dashboard by Product
+  fastify.get('/dashboard/profit-by-product', { preHandler: fastify.authenticate }, async (req, reply) => {
+    try {
+      const userId = req.user.user_id;
+      const q = `
+        SELECT 
+          p.product_id,
+          p.product_name,
+          COALESCE(SUM(g.grn_amount), 0)::numeric(18,2) AS total_purchase_amount,
+          COALESCE(SUM(s.sale_amount), 0)::numeric(18,2) AS total_sales_amount,
+          (COALESCE(SUM(s.sale_amount), 0) - COALESCE(SUM(g.grn_amount), 0))::numeric(18,2) AS gross_profit
+        FROM product p
+        LEFT JOIN grn g ON p.product_id = g.product_id AND g.user_id = $1
+        LEFT JOIN sale s ON p.product_id = s.product_id AND s.user_id = $1
+        GROUP BY p.product_id, p.product_name
+        ORDER BY gross_profit DESC
+      `;
+      const res = await pool.query(q, [userId]);
+      return reply.send(res.rows);
+    } catch (err) {
+      console.error('Profit by product error:', err);
+      return reply.code(500).send({ error: err.message });
+    }
+  });
+
+  // API: Overall Business Summary
+  fastify.get('/dashboard/business-summary', { preHandler: fastify.authenticate }, async (req, reply) => {
+    try {
+      const userId = req.user.user_id;
+      const q = `
+        SELECT 
+          (SELECT COALESCE(SUM(grn_amount), 0) FROM grn WHERE user_id = $1)::numeric(18,2) AS total_purchase,
+          (SELECT COALESCE(SUM(sale_amount), 0) FROM sale WHERE user_id = $1)::numeric(18,2) AS total_sales,
+          ((SELECT COALESCE(SUM(sale_amount), 0) FROM sale WHERE user_id = $1) -
+           (SELECT COALESCE(SUM(grn_amount), 0) FROM grn WHERE user_id = $1))::numeric(18,2) AS total_profit
+      `;
+      const res = await pool.query(q, [userId]);
+      return reply.send(res.rows[0] || { total_purchase: 0, total_sales: 0, total_profit: 0 });
+    } catch (err) {
+      console.error('Business summary error:', err);
+      return reply.code(500).send({ error: err.message });
+    }
+  });
+
 }
 
 module.exports = dashboardRoutes;
