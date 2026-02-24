@@ -2,3 +2,4 @@
 /db/pool2.js
 /db/ca.pem
 /.env
+/.activitity_answer.sql
