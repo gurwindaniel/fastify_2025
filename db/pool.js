@@ -9,26 +9,28 @@ const isHeroku = !!process.env.DATABASE_URL;
 let pool;
 
 if (isHeroku) {
-    // Heroku PostgreSQL - uses DATABASE_URL
+    // Heroku with external DB (e.g., Aiven) - uses DATABASE_URL
     pool = new Pool({
         connectionString: process.env.DATABASE_URL,
-        ssl: {
+        ssl: process.env.DATABASE_URL.includes('localhost') ? false : {
             rejectUnauthorized: false
         }
     });
 } else {
     // Local/Aiven with ca.pem certificate
-    const caCert = fs.readFileSync(path.join(__dirname, 'ca.pem')).toString();
+    const caPath = path.join(__dirname, 'ca.pem');
+    const hasCert = fs.existsSync(caPath);
+    
     pool = new Pool({
         user: process.env.DB_USER,
         host: process.env.DB_HOST,
         database: process.env.DB_DATABASE,
         password: process.env.DB_PASSWORD,
         port: process.env.DB_PORT,
-        ssl: {
-            ca: caCert,
+        ssl: hasCert ? {
+            ca: fs.readFileSync(caPath).toString(),
             rejectUnauthorized: false
-        }
+        } : false
     });
 }
 
