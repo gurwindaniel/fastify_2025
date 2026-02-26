@@ -12,8 +12,9 @@ if (isHeroku) {
     // Heroku with external DB (e.g., Aiven) - uses DATABASE_URL
     pool = new Pool({
         connectionString: process.env.DATABASE_URL,
-        ssl: process.env.DATABASE_URL.includes('localhost') ? false : {
-            rejectUnauthorized: false
+        ssl: {
+            ca: process.env.DB_CA_CERT,
+            rejectUnauthorized: true
         }
     });
 } else {
@@ -27,12 +28,11 @@ if (isHeroku) {
         database: process.env.DB_DATABASE,
         password: process.env.DB_PASSWORD,
         port: process.env.DB_PORT,
-        ssl: {
-    rejectUnauthorized: false
-     }
+        ssl: hasCert ? {
+            ca: fs.readFileSync(caPath).toString(),
+            rejectUnauthorized: true
+        } : false
     });
 }
 
-
-
-module.exports=pool;
+module.exports = pool;
