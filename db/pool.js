@@ -13,8 +13,7 @@ if (isHeroku) {
     pool = new Pool({
         connectionString: process.env.DATABASE_URL,
         ssl: {
-            ca: process.env.DB_CA_CERT,
-            rejectUnauthorized: true
+            rejectUnauthorized: false
         }
     });
 } else {
