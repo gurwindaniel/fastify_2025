@@ -27,10 +27,9 @@ if (isHeroku) {
         database: process.env.DB_DATABASE,
         password: process.env.DB_PASSWORD,
         port: process.env.DB_PORT,
-        ssl: hasCert ? {
-            ca: fs.readFileSync(caPath).toString(),
-            rejectUnauthorized: false
-        } : false
+        ssl: {
+    rejectUnauthorized: false
+     }
     });
 }
 
