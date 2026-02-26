@@ -114,7 +114,7 @@ fastify.register(require('./routes/dashboard'));
 
 
 // Start server
-fastify.listen({ port: 3000 }, err => {
+fastify.listen({ port: process.env.PORT || 3000 }, err => {
   if (err) throw err;
   console.log("Server running on http://localhost:3000");
 });
