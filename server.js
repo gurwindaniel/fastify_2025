@@ -62,7 +62,7 @@ fastify.addHook("preHandler", async (req, reply) => {
     if (url.startsWith("/public/")) return;
 
     // Allow authentication-free pages
-    const publicRoutes = ["/login", "/"];
+    const publicRoutes = ["/login"];
     if (publicRoutes.includes(url)) return;
 
     try {
